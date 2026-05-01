@@ -21,16 +21,17 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Fix Maven Permissions
+      - name: Fix Maven Permissions (Runner)
         run: chmod +x mvnw
 
       - name: Run Test Suite
+        # Verifies Virtual Threads and Security Logic
         run: ./mvnw clean test
 
       - name: Package Artifact
         run: ./mvnw package -DskipTests
 
-  # Station 2: Docker Verification (Build only, No Release)
+  # Station 2: Docker Verification
   docker-verify:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -45,7 +46,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          # 'push: false' means it builds the image to check for errors 
-          # but DOES NOT try to send it to DockerHub.
+          # We set push to false so it only checks if the build works
           push: false 
           tags: config-core:test
